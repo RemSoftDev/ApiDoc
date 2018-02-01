@@ -1,0 +1,9 @@
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\bin\Debug\ApiDoc.HtmlProcessor.exe.config
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\bin\Debug\ApiDoc.HtmlProcessor.XML
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\bin\Debug\ApiDoc.HtmlProcessor.exe
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\bin\Debug\ApiDoc.HtmlProcessor.pdb
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\bin\Debug\FSharp.Core.dll
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\bin\Debug\System.ValueTuple.dll
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\bin\Debug\FSharp.Core.xml
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\obj\Debug\ApiDoc.HtmlProcessor.exe
+C:\Users\sergi\Desktop\ApiDoc\ApiDoc\ApiDoc.HtmlProcessor\obj\Debug\ApiDoc.HtmlProcessor.pdb

@@ -34,5 +34,4 @@ let open_tag_parser html =
     (Some(left_bracket_parser), html)
     ++ (fun _ -> letters_accumulator)
     ++ (fun _ -> whitespace_accumulator <||> forward_slash_parser)
-    ++ (fun _ -> forward_slash_parser <||> (unit_parser ['/']))
     ++ (fun _ -> right_bracket_parser)

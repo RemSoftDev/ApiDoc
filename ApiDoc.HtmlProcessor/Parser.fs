@@ -79,4 +79,15 @@ let first p1 p2 =
         | (None, html') -> run_parser ((Some(p2), html))
         | success -> success)
     |> make_parser
-let (<||>) p1 p2 = first p1 p2
+let (<??>) p1 p2 = first p1 p2
+
+let try_all parsers =
+    let rec try_all' parsers result html =
+        match parsers with 
+        | [] -> result
+        | h::t -> 
+            let (maybeResult, html') = run_parser (Some(h), html)
+            try_all' t (maybeResult, html') html'
+    (try_all' parsers (Some([]), []))
+    |> make_parser
+let (<||>) p1 p2 = try_all [p1; p2;]

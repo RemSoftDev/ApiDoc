@@ -10,7 +10,7 @@ let default_report = Parser.report (fun result -> printfn "%s" "Parsed successfu
 [<EntryPoint>]
 let main argv =        
   
-    ['<';'h'; 'r';' ';'/'; '>';]
+    ['<';'h'; 'r';'/'; '>';]
     |> HtmlParser.open_tag_parser 
     |> Parser.run_parser
     |> default_report

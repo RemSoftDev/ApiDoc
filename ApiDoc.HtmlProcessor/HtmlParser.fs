@@ -31,7 +31,7 @@ let forward_slash_parser = next_char_constant_parser '/' |> accumulate_exactly 1
 let left_bracket_parser = next_char_constant_parser '<' |> accumulate_exactly 1
 let right_bracket_parser = next_char_constant_parser '>' |> accumulate_exactly 1
 let open_tag_parser html = 
-    (Some(left_bracket_parser), html)
+    (html <-> left_bracket_parser) 
     ++ (fun _ -> letters_accumulator)
     ++ (fun _ -> whitespace_accumulator <||> forward_slash_parser)
     ++ (fun _ -> right_bracket_parser)

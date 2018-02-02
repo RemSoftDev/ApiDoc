@@ -34,6 +34,12 @@ let (++) (maybeParser, html) (f:('a -> Parser<'b>)) =
     | Some parser -> (unwrap_parser parser html) |> (fun (parseResult, html') -> ((parseResult |> Option.map f), html'))
     | None -> (None, html)
 
+(*
+    pairs chars which are intendent to be parsed with parser,
+    such that (++) could be applied outright
+*)
+let (<->) (x : char list) (y : Parser<_>) = (Some(y), x)
+
 let unit_parser unit = 
     (fun html -> ((Some(unit)), html)) 
     |> make_parser
@@ -67,12 +73,11 @@ let accumulate_exactly accumulator empty times parser =
     (fun html -> (accumulate_exactly' times empty html html))
     |> make_parser
 
+
 (*
     given a sequence of parsers, 
     the result of the first successful is returned 
 *)
-open Global
-
 let first p1 p2 = 
     (fun html ->
         match (run_parser (Some(p1), html)) with

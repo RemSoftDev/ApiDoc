@@ -2,7 +2,6 @@
 // See the 'F# Tutorial' project for more help.
 
 open System
-open Global
 open Parser
 
 let default_report = Parser.report (fun result -> printfn "%s" "Parsed successfully.") (printfn "Was unable to parse: %A")

@@ -2,25 +2,29 @@
 // See the 'F# Tutorial' project for more help.
 
 open System
-open HtmlParsing
+open Global
+open Parser
 
 
 [<EntryPoint>]
 let main argv =
+
     (* 
         usage example:
             sequencing of "primitive parsers" is applied recursively
             in order to read content of the '<p>' tag;
             as long as content is parsed, parsing considered completed.
-    *)
-    let fakeHtml = ['<';'p';'>';] @ ['t';'e';'x';'t';] @ ['<';'/';'p';'>';]
-    (Some(nextCharConstantParser '<'), fakeHtml)
-    ++ (fun openBracket -> (nextCharParser Char.IsLetter) |> accumulate)
-    ++ (fun tagName -> nextCharConstantParser '>')
-    ++ (fun closeBracket -> (nextCharParser Char.IsLetter) |> accumulate)
-    |> runParser
-    |> (printfn "%A")
+    *)        
     
+    (['<';'p';'>';] @ ['t';'e';'x';'t';] @ ['<';'/';'p';'>';] 
+    |> (pair (Some(HtmlParser.next_char_constant_parser '<'))))
+    ++ (fun openBracket -> (HtmlParser.next_char_parser Char.IsLetter) |> HtmlParser.accumulate_while_success)
+    ++ (fun tagName -> HtmlParser.next_char_constant_parser '>')
+    ++ (fun closeBracket -> (HtmlParser.next_char_parser Char.IsLetter) |> HtmlParser.accumulate_while_success)
+    |> Parser.run_parser
+    |> (printfn "%A") 
+
+
     Console.ReadLine() |> ignore
 
     0 // return an integer exit code

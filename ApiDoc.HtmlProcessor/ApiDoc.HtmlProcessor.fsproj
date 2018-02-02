@@ -57,7 +57,9 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
-    <Compile Include="HtmlParsing.Types.fs" />
+    <Compile Include="Global.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="HtmlParser.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

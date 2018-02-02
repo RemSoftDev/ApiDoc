@@ -30,7 +30,13 @@ let letters_accumulator = next_char_parser Char.IsLetter |> accumulate_while_suc
 let forward_slash_parser = next_char_constant_parser '/' |> accumulate_exactly 1
 let left_bracket_parser = next_char_constant_parser '<' |> accumulate_exactly 1
 let right_bracket_parser = next_char_constant_parser '>' |> accumulate_exactly 1
+
 let open_tag_parser html = 
+    (html <-> left_bracket_parser) 
+    ++ (fun _ -> letters_accumulator)
+    ++ (fun _ -> whitespace_accumulator <||> right_bracket_parser)
+
+let close_tag_parser html = 
     (html <-> left_bracket_parser) 
     ++ (fun _ -> letters_accumulator)
     ++ (fun _ -> whitespace_accumulator <||> forward_slash_parser)

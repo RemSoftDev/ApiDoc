@@ -1,0 +1,21 @@
+﻿[
+  {
+    "MethodName": "string",
+    "MethodDescription": "string",
+    "MethodReturnType": "string",
+    "MethodParams": [
+      {
+        "ParamName": "string",
+        "ParamDescription": "string",
+        "ParamType": "string",
+        "ParamIsFullType": "bool",
+        "ParamLimitations": [
+          {
+            "MoreThan": "string",
+            "LessThan": "string"
+          }
+        ]
+      }
+    ]
+  }
+]

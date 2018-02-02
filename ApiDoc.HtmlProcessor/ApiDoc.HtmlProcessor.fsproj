@@ -58,7 +58,6 @@
     <None Include="App.config" />
     <Content Include="packages.config" />
     <Compile Include="Parser.fs" />
-    <Compile Include="HtmlParser.fs" />
     <None Include="Doc\JsonFormat.json" />
     <Compile Include="Program.fs" />
   </ItemGroup>

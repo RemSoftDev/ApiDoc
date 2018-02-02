@@ -13,6 +13,15 @@ let run_parser (maybeParser, html) =
     | Some parser -> (unwrap_parser parser) html
     | None -> (None, html)
 
+let report success failure (result, html) =
+    if (result |> Option.isSome) && (html = [])
+    then 
+        success result
+        (result, html)
+    else 
+        failure html
+        (result, html)
+
 (* 
     sequencing of parsers: 
         1) try parse given html with given parser;
@@ -24,6 +33,11 @@ let (++) (maybeParser, html) (f:('a -> Parser<'b>)) =
     match maybeParser with
     | Some parser -> (unwrap_parser parser html) |> (fun (parseResult, html') -> ((parseResult |> Option.map f), html'))
     | None -> (None, html)
+
+let unit_parser unit = 
+    (fun html -> ((Some(unit)), html)) 
+    |> make_parser
+
 
 (* recursivelt repeats parser invokation until if fails *)
 let accumulate_while_success accumulator empty parser = 
@@ -57,15 +71,12 @@ let accumulate_exactly accumulator empty times parser =
     given a sequence of parsers, 
     the result of the first successful is returned 
 *)
-let any parsers =
-    let rec first' parsers html =
-        match parsers with
-        | [] -> (None, html)
-        | h::t ->
-            match run_parser ((Some(h)), html) with
-            | (None, html') -> first' t html'
-            | success -> success
-    (first' parsers)
-    |> make_parser
-        
+open Global
 
+let first p1 p2 = 
+    (fun html ->
+        match (run_parser (Some(p1), html)) with
+        | (None, html') -> run_parser ((Some(p2), html))
+        | success -> success)
+    |> make_parser
+let (<||>) p1 p2 = first p1 p2

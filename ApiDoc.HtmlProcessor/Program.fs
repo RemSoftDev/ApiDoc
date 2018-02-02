@@ -5,19 +5,16 @@ open System
 open Global
 open Parser
 
+let default_report = Parser.report (fun result -> printfn "%s" "Parsed successfully.") (printfn "Was unable to parse: %A")
 
 [<EntryPoint>]
-let main argv =
-
-    let any_combiner_test = 
-        [HtmlParser.open_tag_parser; HtmlParser.letters_accumulator;] 
-        |> any
-        |> Parser.accumulate_while_success (@) []
-
-    (Some(any_combiner_test), ['<';'h'; 'r';'/'; '>';])
+let main argv =        
+  
+    ['<';'h'; 'r';' ';'/'; '>';]
+    |> HtmlParser.open_tag_parser 
     |> Parser.run_parser
-    |> (printfn "%A")
-
+    |> default_report
+    |> ignore
 
     Console.ReadLine() |> ignore
 

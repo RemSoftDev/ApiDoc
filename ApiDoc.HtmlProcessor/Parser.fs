@@ -29,7 +29,7 @@ let (++) (maybeParser, html) (f:('a -> Parser<'b>)) =
 let accumulate_while_success accumulator empty parser = 
     let rec accumulate_while_success' result html  =
         match unwrap_parser parser html with
-        | (None, html) -> (Some(result), html)
+        | (None, html) -> if result <> empty then (Some(result), html) else (None, html)
         | (Some(result'), html') -> accumulate_while_success' (accumulator result result') html'
     (accumulate_while_success' empty) 
     |> make_parser
@@ -39,19 +39,33 @@ let accumulate_while_success accumulator empty parser =
     in any other case the result considered to be failure
 *)   
 let accumulate_exactly accumulator empty times parser = 
-    let rec accumulate_exactly' times result html  =
+    let rec accumulate_exactly' times result original html  =
         match times with
         | 0 -> 
             match unwrap_parser parser html with
             | (None, html) -> (Some(result), html)
-            | (Some(result'), html') -> (None, html)
+            | (Some(result'), html') -> (None, original)
         | times' -> 
             match unwrap_parser parser html with
             | (None, html) -> (None, html)
-            | (Some(result'), html') -> accumulate_exactly' (times' - 1) (accumulator result result') html'
+            | (Some(result'), html') -> accumulate_exactly' (times' - 1) (accumulator result result') html html'
             
-    (accumulate_exactly' times empty) 
+    (fun html -> (accumulate_exactly' times empty html html))
     |> make_parser
 
+(*
+    given a sequence of parsers, 
+    the result of the first successful is returned 
+*)
+let any parsers =
+    let rec first' parsers html =
+        match parsers with
+        | [] -> (None, html)
+        | h::t ->
+            match run_parser ((Some(h)), html) with
+            | (None, html') -> first' t html'
+            | success -> success
+    (first' parsers)
+    |> make_parser
         
 

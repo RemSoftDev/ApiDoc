@@ -10,10 +10,8 @@ open Parser
 let main argv =        
     
     ['a'..'z'] -->
-    (next_char_parser
-    >>== next_char_parser
-    >>== next_char_parser
-    >>== next_char_parser)
+    (next_char_when Char.IsLetter
+    >>== next_char_when Char.IsDigit)
     |> (printfn "%A")
 
     Console.ReadLine() |> ignore

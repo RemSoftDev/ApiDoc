@@ -57,6 +57,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Compile Include="OkOrThrow.fs" />
     <Compile Include="Parser.fs" />
     <None Include="Doc\JsonFormat.json" />
     <Compile Include="Program.fs" />

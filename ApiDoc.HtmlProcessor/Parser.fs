@@ -1,9 +1,14 @@
 ﻿module Parser
+open OkOrThrow
 
-type Parser<'Result> = ParserImpl of (char list -> ('Result option * char list))
+type Parser<'Result> = ParserImpl of (char list -> (OkOrThrow<'Result, string> * char list))
 
 let return_parser initial = 
-    (fun symbols -> (Some(initial), symbols)) 
+    (fun symbols -> (Ok(initial), symbols)) 
+    |> ParserImpl
+
+let broken_parser<'a> = 
+    (fun symbols -> (OkOrThrow<'a, string>.Throw("This parser never ever succees..."), symbols))
     |> ParserImpl
 
 let private get_parser_impl parser = 
@@ -13,19 +18,23 @@ let (-->) symbols parser = (get_parser_impl parser) symbols
 
 let bind (f:('a -> Parser<'b>)) parser = 
     get_parser_impl parser
-    |> (fun parserImpl -> parserImpl >> (fun (result, symbols') -> if result |> Option.isSome 
-                                                                   then symbols' --> f (Option.get result)
-                                                                   else (None, symbols')))
+    |> (fun parserImpl -> parserImpl >> 
+        (fun (okOrThrow, symbols') -> 
+            okOrThrow 
+            |> OkOrThrow.map (fun ok -> symbols' --> f ok) (fun throw -> (Throw(throw), symbols'))))
     |> ParserImpl
+
 let (>>=) parser f = bind f parser
 let (>>==) lparser rparser = lparser >>= (fun _ -> rparser)
 
-let next_char_parser = 
+let next_char_when f =
     (fun symbols -> 
         match symbols with
-        | [] -> (None, [])
-        | h::t -> (Some(h), t))
-    |> ParserImpl
-
+        | [] -> (Throw("No char to consume."), [])
+        | h::t -> 
+            if f h 
+            then (Ok(h), t) 
+            else (Throw(sprintf "Consumed char '%c' does not meet the predicate's requirement. Predicate: %A." h f), symbols))
+    |> ParserImpl     
 
 

@@ -4,16 +4,16 @@ type OkOrThrow<'a, 'b> =
     | Ok of 'a
     | Throw of 'b
 
-let bind o t oot =
+let apply o t oot =
     match oot with 
     | Ok value -> o value
     | Throw error -> t error
 
-let map o oot = oot |> bind (fun ok -> Ok(o ok)) (fun throw -> Throw(throw))
+let map o oot = oot |> apply (fun ok -> Ok(o ok)) (fun throw -> Throw(throw))
    
-let rethrow o oot = oot |> bind o (fun throw -> Throw(throw))
+let rethrow o oot = oot |> apply o (fun throw -> Throw(throw))
 
-let isOk oot = oot |> bind (fun _ -> true) (fun _ -> false)
+let isOk oot = oot |> apply (fun _ -> true) (fun _ -> false)
 
 let merge f g loot root =   
     match (loot, root) with 

@@ -17,7 +17,7 @@ let private _chain f parser =
     |> (fun parserImpl -> parserImpl >> 
         (fun (okOrThrow, symbols') -> 
             okOrThrow 
-            |> OkOrThrow.bind ((f symbols')) (fun throw -> (Throw(throw), symbols'))))
+            |> OkOrThrow.apply ((f symbols')) (fun throw -> (Throw(throw), symbols'))))
     |> ParserImpl
 
 let private _bind (f:('a -> Parser<'b>)) = _chain (fun symbols ok -> symbols --> f ok)
@@ -56,3 +56,14 @@ let accumulator f parser =
     |> ParserImpl
 
 
+let any parsers = 
+    let rec any' parsers result symbols =
+        match parsers with
+        | [] -> result
+        | h::t -> 
+            let (okOrThrow, symbols') = symbols --> h
+            if okOrThrow |> OkOrThrow.isOk 
+            then (okOrThrow, symbols') 
+            else (any' t (okOrThrow, symbols') symbols')
+    (any' parsers (Throw("You need at least single parser to run 'any'."), []))
+    |> ParserImpl

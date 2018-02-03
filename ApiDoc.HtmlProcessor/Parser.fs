@@ -55,7 +55,6 @@ let accumulator f parser =
     (accumulator' []) 
     |> ParserImpl
 
-
 let any parsers = 
     let rec any' parsers result symbols =
         match parsers with

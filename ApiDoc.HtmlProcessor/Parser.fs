@@ -21,11 +21,19 @@ let bind (f:('a -> Parser<'b>)) parser =
     |> (fun parserImpl -> parserImpl >> 
         (fun (okOrThrow, symbols') -> 
             okOrThrow 
-            |> OkOrThrow.map (fun ok -> symbols' --> f ok) (fun throw -> (Throw(throw), symbols'))))
+            |> OkOrThrow.bind (fun ok -> symbols' --> f ok) (fun throw -> (Throw(throw), symbols'))))
     |> ParserImpl
-
 let (>>=) parser f = bind f parser
 let (>>==) lparser rparser = lparser >>= (fun _ -> rparser)
+
+let transform f parser =
+    get_parser_impl parser
+    |> (fun parserImpl -> parserImpl >> 
+        (fun (okOrThrow, symbols') -> 
+            okOrThrow 
+            |> OkOrThrow.bind (fun ok -> symbols' --> (return_parser (f ok))) (fun throw -> (Throw(throw), symbols'))))
+    |> ParserImpl
+let (|>|) parser f = transform f parser
 
 let next_char_when f =
     (fun symbols -> 
@@ -35,6 +43,24 @@ let next_char_when f =
             if f h 
             then (Ok(h), t) 
             else (Throw(sprintf "Consumed char '%c' does not meet the predicate's requirement. Predicate: %A." h f), symbols))
-    |> ParserImpl     
+    |> ParserImpl
+
+open Shared 
+let merge_parse_results f = OkOrThrow.merge f (+)
+let accumulator f parser = 
+    let rec accumulator' result symbols =
+        match symbols --> parser with
+        | (Ok result', symbols') -> accumulator' (Ok (result') :: result) symbols'
+        | (Throw error, symbols') -> 
+            if result = []
+            then (Throw (error), symbols')
+            else 
+                result 
+                |> List.rev
+                |> List.reduce (merge_parse_results f)
+                |> pair symbols'
+                |> swap
+    (accumulator' []) 
+    |> ParserImpl
 
 

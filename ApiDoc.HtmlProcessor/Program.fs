@@ -2,6 +2,7 @@
 // See the 'F# Tutorial' project for more help.
 
 open System
+open Shared
 open Parser
 
 
@@ -10,8 +11,13 @@ open Parser
 let main argv =        
     
     ['a'..'z'] -->
-    (next_char_when Char.IsLetter
-    >>== next_char_when Char.IsDigit)
+    (   
+        // firstly the parser is constructed with help of proper combinators;
+        // only after that parsing itself takes place
+
+        next_char_when Char.IsLetter // defining a primitive single-char-per-step parser
+        |>| stringify // Parser<char> -> (char -> string) -> Parser<string>
+        |> (accumulator (+))) // giving a primitive parser an ability to accumulate characters into a single string
     |> (printfn "%A")
 
     Console.ReadLine() |> ignore

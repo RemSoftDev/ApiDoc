@@ -7,33 +7,25 @@ let return_parser initial =
     (fun symbols -> (Ok(initial), symbols)) 
     |> ParserImpl
 
-let broken_parser<'a> = 
-    (fun symbols -> (OkOrThrow<'a, string>.Throw("This parser never ever succees..."), symbols))
-    |> ParserImpl
-
-let private get_parser_impl parser = 
+let private _get_parser_impl parser = 
     match parser with
     | ParserImpl parserImpl -> parserImpl
-let (-->) symbols parser = (get_parser_impl parser) symbols
+let (-->) symbols parser = (_get_parser_impl parser) symbols
 
-let bind (f:('a -> Parser<'b>)) parser = 
-    get_parser_impl parser
+let private _chain f parser =
+    _get_parser_impl parser
     |> (fun parserImpl -> parserImpl >> 
         (fun (okOrThrow, symbols') -> 
             okOrThrow 
-            |> OkOrThrow.bind (fun ok -> symbols' --> f ok) (fun throw -> (Throw(throw), symbols'))))
+            |> OkOrThrow.bind ((f symbols')) (fun throw -> (Throw(throw), symbols'))))
     |> ParserImpl
-let (>>=) parser f = bind f parser
+
+let private _bind (f:('a -> Parser<'b>)) = _chain (fun symbols ok -> symbols --> f ok)
+let (>>=) parser f = _bind f parser
 let (>>==) lparser rparser = lparser >>= (fun _ -> rparser)
 
-let transform f parser =
-    get_parser_impl parser
-    |> (fun parserImpl -> parserImpl >> 
-        (fun (okOrThrow, symbols') -> 
-            okOrThrow 
-            |> OkOrThrow.bind (fun ok -> symbols' --> (return_parser (f ok))) (fun throw -> (Throw(throw), symbols'))))
-    |> ParserImpl
-let (|>|) parser f = transform f parser
+let private _transform f = _chain (fun symbols ok -> symbols --> (return_parser (f ok)))
+let (|>|) parser f = _transform f parser
 
 let next_char_when f =
     (fun symbols -> 
@@ -46,7 +38,7 @@ let next_char_when f =
     |> ParserImpl
 
 open Shared 
-let merge_parse_results f = OkOrThrow.merge f (+)
+let private _merge_parse_results f = OkOrThrow.merge f (+)
 let accumulator f parser = 
     let rec accumulator' result symbols =
         match symbols --> parser with
@@ -57,7 +49,7 @@ let accumulator f parser =
             else 
                 result 
                 |> List.rev
-                |> List.reduce (merge_parse_results f)
+                |> List.reduce (_merge_parse_results f)
                 |> pair symbols'
                 |> swap
     (accumulator' []) 

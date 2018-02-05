@@ -64,5 +64,5 @@ let any parsers =
             if okOrThrow |> OkOrThrow.isOk 
             then (okOrThrow, symbols') 
             else (any' t (okOrThrow, symbols') symbols')
-    (any' parsers (Throw("You need at least single parser to run 'any'."), []))
+    (any' parsers (Throw("You need at least one parser to run 'any'."), []))
     |> ParserImpl

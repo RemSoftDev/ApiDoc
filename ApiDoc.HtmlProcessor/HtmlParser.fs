@@ -14,7 +14,8 @@ let private _quote_sing_parser =  next_char_when (fun c -> c = '\'')
 let private _double_quote_sign_parser = next_char_when (fun c -> c = '"')
 
 let private _either_quote_sign_parser = [_quote_sing_parser; _double_quote_sign_parser;] |> any
-let private _close_tag_parser = _forward_slash_parser >>== _close_bracket_parser
+let private _self_standing_close_tag_parser = _forward_slash_parser >>== _close_bracket_parser
+let private _close_tag_parser = _open_bracket_parser >>== _forward_slash_parser
 
 let private _letters_accumulator = next_char_when Char.IsLetter |>| stringify |> accumulator (+)
 let private _whitespaces_accumulator = next_char_when Char.IsWhiteSpace |> accumulator (fun _ __ -> ' ')
@@ -38,6 +39,12 @@ let private _attributes_parser =
 let self_standing_tag_parser = 
     _tag_opening_parser
     >>== ([_attributes_parser; (return_parser " ");] |> any)
-    >>== _close_tag_parser
+    >>== _self_standing_close_tag_parser
+
+let closing_tag_parser = 
+    _close_tag_parser
+    >>== ([_whitespaces_accumulator; (return_parser ' ');] |> any)
+    >>== _letters_accumulator
+    >>== _close_bracket_parser
 
 

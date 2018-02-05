@@ -94,3 +94,21 @@ let ``Should parse many self-standing tags.``() =
     (self_standing_tag_parser |>| stringify |> accumulator (+))
     |> is_success
     |> assert_is_true
+
+[<Test>]
+let ``Should parse closing tag without whitespaces.``() = 
+    (to_char_list "</tag>") --> closing_tag_parser
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse closing tag with single whitespace.``() = 
+    (to_char_list "</ tag>") --> closing_tag_parser
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse closing tag with multiple whitespace.``() = 
+    (to_char_list "</  tag>") --> closing_tag_parser
+    |> is_success
+    |> assert_is_true

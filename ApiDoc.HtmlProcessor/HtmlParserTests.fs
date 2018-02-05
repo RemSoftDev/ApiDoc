@@ -59,38 +59,38 @@ let ``Should parse self-standing tag with single signle-quoted attribute and sin
 
 [<Test>]
 let ``Should parse self-standing tag with multiple single-quoted attributes and single whitespace from the left.``() = 
-    (to_char_list "<div att='value' att='value'/>") --> HtmlParser.self_standing_tag_parser 
+    (to_char_list "<div att='value' attr='val'/>") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
    
 [<Test>]
 let ``Should parse self-standing tag with multiple signle-quoted attributes and single whitespaces from the left and right.``() = 
-    (to_char_list "<div att='value' att='value' />") --> HtmlParser.self_standing_tag_parser 
+    (to_char_list "<div att='value' attr='val' />") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse self-standing tag with multiple double-quoted attributes and single whitespace from the left.``() = 
-    (to_char_list "<div att=\"value\" att=\"value\"/>") --> HtmlParser.self_standing_tag_parser 
+    (to_char_list "<div att=\"value\" attr=\"val\"/>") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
    
 [<Test>]
 let ``Should parse self-standing tag with multiple double-quoted attributes and single whitespaces from the left and right.``() = 
-    (to_char_list "<div att=\"value\" att=\"value\" />") --> HtmlParser.self_standing_tag_parser 
+    (to_char_list "<div att=\"value\" attr=\"val\" />") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse both self-standing tags.``() = 
-    (to_char_list "<div att=\"value\" att=\"value\" /><div/>") --> 
+    (to_char_list "<div att=\"value\" attr=\"val\" /><div/>") --> 
     (self_standing_tag_parser >>== self_standing_tag_parser)
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse many self-standing tags.``() = 
-    (to_char_list "<div att=\"value\" att=\"value\" /><div/><div att=\"value\" att=\"value\"/><div />") --> 
+    (to_char_list "<div att=\"value\" attr=\"val\" /><div/><div att=\"value\" attr=\"val\"/><div />") --> 
     (self_standing_tag_parser |>| stringify |> accumulator (+))
     |> is_success
     |> assert_is_true
@@ -110,5 +110,29 @@ let ``Should parse closing tag with single whitespace.``() =
 [<Test>]
 let ``Should parse closing tag with multiple whitespace.``() = 
     (to_char_list "</  tag>") --> closing_tag_parser
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse opening tag without attributes and no whitespaces.``() = 
+    (to_char_list "<tag>") --> opening_tag_parser
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse opening tag with single attribute and single whitespace.``() = 
+    (to_char_list "<tag att=\"value\">") --> opening_tag_parser
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse opening tag with single attribute and single whitespace from both sides.``() = 
+    (to_char_list "<tag att=\"value\" >") --> opening_tag_parser
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse opening tag with multiple attributes and single whitespace from both sides.``() = 
+    (to_char_list "<tag att=\"value\" attr=\"val\">") --> opening_tag_parser
     |> is_success
     |> assert_is_true

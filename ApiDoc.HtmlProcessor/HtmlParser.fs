@@ -41,6 +41,11 @@ let self_standing_tag_parser =
     >>== ([_attributes_parser; (return_parser " ");] |> any)
     >>== _self_standing_close_tag_parser
 
+let opening_tag_parser = 
+    _tag_opening_parser
+    >>== ([_attributes_parser; (return_parser " ");] |> any)
+    >>== _close_bracket_parser
+
 let closing_tag_parser = 
     _close_tag_parser
     >>== ([_whitespaces_accumulator; (return_parser ' ');] |> any)

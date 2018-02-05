@@ -21,11 +21,6 @@ let private _tag_opening_parser =
     _open_bracket_parser
     >>== _letters_accumulator
 
-let self_standing_tag_without_attributes_parser = 
-    _tag_opening_parser
-    >>== ([_whitespaces_accumulator; (return_parser ' ');] |> any)
-    >>== _close_tag_parser;
-
 let private _attribute_parser = 
     (_whitespaces_accumulator
     >>== _letters_accumulator 
@@ -36,9 +31,9 @@ let private _attribute_parser =
     |>| stringify
     |> accumulator (+)
 
-let self_standing_tag_with_1_or_more_atts_parser = 
+let self_standing_tag_parser = 
     _tag_opening_parser
-    >>== _attribute_parser
+    >>== ([_attribute_parser; (return_parser " ");] |> any)
     >>== _close_tag_parser
 
 

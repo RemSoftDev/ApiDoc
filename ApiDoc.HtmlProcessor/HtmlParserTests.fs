@@ -2,6 +2,7 @@
 
 open System
 open NUnit.Framework
+open Shared
 open Parser
 open HtmlParser
 
@@ -16,42 +17,80 @@ let assert_is_true (x : bool) = Assert.IsTrue(x)
 
 [<Test>]
 let ``Should parse self-standing tag with no attributes and no whitespaces.``() = 
-    (to_char_list "<div/>") --> HtmlParser.self_standing_tag_without_attributes_parser 
+    (to_char_list "<div/>") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
     
 [<Test>]
 let ``Should parse self-standing tag with no attributes and single whitespace.``() = 
-    (to_char_list "<div />") --> HtmlParser.self_standing_tag_without_attributes_parser 
+    (to_char_list "<div />") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse self-standing tag with no attributes and multiple whitespaces.``() = 
-    (to_char_list "<div   />") --> HtmlParser.self_standing_tag_without_attributes_parser 
+    (to_char_list "<div   />") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse self-standing tag with single dobule-quoted attribute and single whitespace from the left.``() = 
-    (to_char_list "<div att=\"value\"/>") --> HtmlParser.self_standing_tag_with_1_or_more_atts_parser 
+    (to_char_list "<div att=\"value\"/>") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse self-standing tag with single dobule-quoted attribute and single whitespaces from the left and right.``() = 
-    (to_char_list "<div att=\"value\" />") --> HtmlParser.self_standing_tag_with_1_or_more_atts_parser 
+    (to_char_list "<div att=\"value\" />") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse self-standing tag with single single-quoted attribute and single whitespace from the left.``() = 
-    (to_char_list "<div att='value'/>") --> HtmlParser.self_standing_tag_with_1_or_more_atts_parser 
+    (to_char_list "<div att='value'/>") --> HtmlParser.self_standing_tag_parser 
     |> is_success
     |> assert_is_true
 
 [<Test>]
 let ``Should parse self-standing tag with single signle-quoted attribute and single whitespaces from the left and right.``() = 
-    (to_char_list "<div att='value' />") --> HtmlParser.self_standing_tag_with_1_or_more_atts_parser 
+    (to_char_list "<div att='value' />") --> HtmlParser.self_standing_tag_parser 
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse self-standing tag with multiple single-quoted attributes and single whitespace from the left.``() = 
+    (to_char_list "<div att='value' att='value'/>") --> HtmlParser.self_standing_tag_parser 
+    |> is_success
+    |> assert_is_true
+   
+[<Test>]
+let ``Should parse self-standing tag with multiple signle-quoted attributes and single whitespaces from the left and right.``() = 
+    (to_char_list "<div att='value' att='value' />") --> HtmlParser.self_standing_tag_parser 
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse self-standing tag with multiple double-quoted attributes and single whitespace from the left.``() = 
+    (to_char_list "<div att=\"value\" att=\"value\"/>") --> HtmlParser.self_standing_tag_parser 
+    |> is_success
+    |> assert_is_true
+   
+[<Test>]
+let ``Should parse self-standing tag with multiple double-quoted attributes and single whitespaces from the left and right.``() = 
+    (to_char_list "<div att=\"value\" att=\"value\" />") --> HtmlParser.self_standing_tag_parser 
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse both self-standing tags.``() = 
+    (to_char_list "<div att=\"value\" att=\"value\" /><div/>") --> 
+    (self_standing_tag_parser >>== self_standing_tag_parser)
+    |> is_success
+    |> assert_is_true
+
+[<Test>]
+let ``Should parse many self-standing tags.``() = 
+    (to_char_list "<div att=\"value\" att=\"value\" /><div/><div att=\"value\" att=\"value\"/><div />") --> 
+    (self_standing_tag_parser |>| stringify |> accumulator (+))
     |> is_success
     |> assert_is_true

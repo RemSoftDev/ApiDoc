@@ -57,6 +57,7 @@ let accumulator f parser =
 
 let any parsers = 
     let rec any' parsers result symbols =
+        printfn "symbols: %A" symbols
         match parsers with
         | [] -> result
         | h::t -> 

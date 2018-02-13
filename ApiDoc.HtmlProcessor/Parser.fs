@@ -1,6 +1,9 @@
 ﻿module Parser
 open OkOrThrow
 
+type IntOrBool = 
+  | I of int
+  | B of bool
 type Parser<'Result> = ParserImpl of (char list -> (OkOrThrow<'Result, string> * char list))
 
 let return_parser initial = 
